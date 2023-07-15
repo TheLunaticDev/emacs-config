@@ -1,0 +1,293 @@
+#+title: Emacs Config
+#+author: by Sushanta Banerjee
+
+This init.el file is made following the [[https://github.com/emacs-tw/awesome-emacs][awesome-emacs]] repository.
+
+* Package Management
+
+Here all the package repositories are setup and initialized.
+[[https://github.com/jwiegley/use-package][use-package]] is used manage packages.
+
+** Initialization
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (require 'package)
+
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			   ("org" . "https://orgmode.org/elpa/")
+			   ("elpa" . "https://elpa.gnu.org/packages/")))
+
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+end_src
+
+** Installation
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (use-package dracula-theme)
+  (use-package page-break-lines)
+  (use-package nerd-icons)
+  (use-package dashboard
+    :config
+    (dashboard-setup-startup-hook))
+  (use-package helpful)
+  (use-package org-modern)
+  (use-package sublimity)
+  (use-package ace-popup-menu)
+  (use-package linum-relative)
+  (use-package beacon)
+  (use-package volatile-highlights)
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1))
+#+END_SRC
+
+* Interface Enhancement
+
+** Other Interface Enhancements
+
+*** Dashboard
+
+An extensible Emacs dashboard.
+URL: https://github.com/emacs-dashboard/emacs-dashboard
+
+**** Dependencies
+
+- [X] (optional) page-break-lines
+- [X] (optional) projectile
+- [X] (optional) all-the-icons
+
+**** Page Break Lines
+
+Emacs: display ugly ^L page breaks as tidy horizontal lines.
+URL: https://github.com/purcell/page-break-lines
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (global-page-break-lines-mode +1)
+#+END_SRC
+
+**** Projectile
+
+Project Interaction Library for Emacs.
+URL: https://github.com/bbatsov/projectile
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (projectile-mode +1)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+#+END_SRC
+
+**** Nerd Icons
+
+URL: https://github.com/rainstormstudio/nerd-icons.el
+
+**** Dashboard Setup
+
+Show dashboard in frames created with emacsclient -c
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (setq initial-buffer-choice (lambda() (get-buffer-create "*dashboard*")))
+#+END_SRC
+
+Set the title.
+The quote is by [[https://en.wikipedia.org/wiki/Swami_Vivekananda][Swami Vivekananda]].
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (setq dashboard-banner-logo-title
+	"Take up one idea.\nMake that one idea your life;
+  dream of it; think of it; live on that idea.\nLet the brain, the body,
+  muscles, nerves, every part of your body be full of that idea, and just
+  leave every other idea alone.\nThis is the way to success, and this is the way
+  great spiritual giants are produced.")
+#+END_SRC
+
+Set the banner.
+Center the Content.
+Disable shortcut "jump" indicators for each section
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (setq dashboard-startup-banner 'logo)
+  (setq dashboard-center-content t)
+  (setq dashboard-show-shortcuts nil)
+#+END_SRC
+
+Setup widgets for dashboard.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (setq dashboard-items '((recents . 5)
+			  (bookmarks . 5)
+			  (projects . 5)
+			  (agenda . 5)
+			  (registers . 5)))
+#+END_SRC
+
+Use nerd-icons with dashboard.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (setq dashboard-dispaly-icons-p t)
+  (setq dashboard-icon-type 'nerd-icons)
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-heading-icons '((recents . "nf-oct-history")
+				  (bookmarks . "nf-oct-book")
+				  (agenda . "nf-oct-calendar")
+				  (projects . "nf-oct-rocket")
+				  (registers . "nf-oct-database")))
+#+END_SRC
+
+Some other settings for dashboard.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (setq dashboard-set-navigator t)
+  (setq dashboard-set-init-info t)
+  (setq dashboard-set-footer nil)
+#+END_SRC
+
+*** Helpful
+
+A better Emacs *help* buffer.
+URL: https://github.com/Wilfred/helpful
+
+Replacing default emacs keybindings with helpful ones.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (global-set-key (kbd "C-h f") #'helpful-callable)
+  (global-set-key (kbd "C-h v") #'helpful-variable)
+  (global-set-key (kbd "C-h k") #'helpful-key)
+  (global-set-key (kbd "C-h x") #'helpful-command)
+  (global-set-key (kbd "C-c C-d") #'helpful-at-point)
+  (global-set-key (kbd "C-h F") #'helpful-function)
+#+END_SRC
+*** Ace Popup Menu
+
+Replace GUI popup menu in Emacs with something more efficient
+URL: https://github.com/mrkkrp/ace-popup-menu
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (ace-popup-menu-mode 1)
+#+END_SRC
+*** Sublimity
+
+Smooth-scrolling and minimap like sublime editor
+URL: https://github.com/zk-phi/sublimity
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (require 'sublimity)
+  (require 'sublimity-scroll)
+  (require 'sublimity-map)
+  (require 'sublimity-attractive)
+  (sublimity-mode 1)
+#+END_SRC
+*** Linum Relative
+
+Display relative line number in the left margin in emacs.
+URL: https://github.com/coldnew/linum-relative
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (linum-on)
+#+END_SRC
+*** Beacon
+
+A light that follows your cursor around so you don't lose it!
+URL: https://github.com/Malabarba/beacon
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (beacon-mode 1)
+ #+END_SRC
+*** Volatile Highlights
+
+Minor mode for visual feedback on some operations in Emacs.
+URL: https://github.com/k-talo/volatile-highlights.el
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (volatile-highlights-mode t)
+#+END_SRC
+
+*** Theme
+
+[[https://draculatheme.com/][Dracula]] theme is my favorite. It's very colourful and minimalistic.
+That is what I opted to use in this config.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (load-theme 'dracula t)
+#+END_SRC
+
+*** Font
+
+I am currently using [[https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/Iosevka][iosevka]] for conding. It is compact and looks polished.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 120)
+#+END_SRC
+
+*** Minimal Emacs
+
+Making emacs look minimal and modern using built-in settings.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1)
+  (menu-bar-mode -1)
+  (set-fringe-mode 10)
+  (setq visible-bell t)
+  #+END_SRC
+
+** Mode Line
+
+A fancy and fast mode-line inspired by minimalism design.
+URL: https://github.com/seagle0128/doom-modeline
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (setq doom-modeline-height 1)
+#+END_SRC
+
+* Note
+
+Emacs can easily replace many other note-taking app.
+The one feature that sets apart emacs from everything else is org-mode.
+
+** Org Mode
+
+It is built into emacs.
+URL: https://orgmode.org/
+
+*** Org Modern
+
+Modern Org Style.
+URL: https://github.com/minad/org-modern
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (add-hook 'org-mode-hook #'org-modern-mode)
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+#+END_SRC
+
+*** Different styles for headers
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (dolist (face '((org-level-1 . 1.40)
+		  (org-level-2 . 1.35)
+		  (org-level-3 . 1.30)
+		  (org-level-4 . 1.25)
+		  (org-level-5 . 1.20)
+		  (org-level-6 . 1.15)
+		  (org-level-7 . 1.10)
+		  (org-level-8 . 1.05)))
+    (set-face-attribute (car face) nil :font "Iosevka Nerd Font" :weight 'regular
+			:height (cdr face)))
+#+END_SRC
+
+*** Org Ellipsis
+
+Changing the Org Ellipsis from ... to something beautiful.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (setq org-ellipsis " 🞃")
+#+END_SRC
+
