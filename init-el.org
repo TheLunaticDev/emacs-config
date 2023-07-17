@@ -47,10 +47,16 @@ Here all the package repositories are setup and initialized.
   (use-package volatile-highlights)
   (use-package doom-modeline
     :init (doom-modeline-mode 1))
+  (use-package highlight-indentation)
+  (use-package company)
+  (use-package flycheck
+    :init (global-flycheck-mode))
+  (use-package which-key
+    :config
+    (which-key-mode))
 #+END_SRC
 
 * Interface Enhancement
-
 ** Other Interface Enhancements
 
 *** Dashboard
@@ -62,7 +68,7 @@ URL: https://github.com/emacs-dashboard/emacs-dashboard
 
 - [X] (optional) page-break-lines
 - [X] (optional) projectile
-- [X] (optional) all-the-icons
+- [X] (optional) nerd-icons
 
 **** Page Break Lines
 
@@ -248,6 +254,80 @@ URL: https://github.com/seagle0128/doom-modeline
   (setq doom-modeline-height 1)
 #+END_SRC
 
+* Editing Enhancement
+
+** Indentation Enhancement
+
+*** Highlight Indentation
+
+Minor modes to highlight indentation guide in emacs.
+URL: https://github.com/antonj/Highlight-Indentation-for-Emacs
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (set-face-background 'highlight-indentation-face "#44475a")
+  (set-face-background 'highlight-indentation-current-column-face "#6272a4")
+  (highlight-indentation-current-column-mode)
+#+END_SRC
+
+* Programming
+
+** Completion
+
+*** Company
+
+Modular in-buffer completion framework for Emacs.
+URL: https://company-mode.github.io/
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (add-hook 'after-init-hook 'global-company-mode)
+#+END_SRC
+
+** LSP Client
+*** lsp-mode
+
+Emacs client/library for the Language Server Protocol.
+URL: https://github.com/emacs-lsp/lsp-mode
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (use-package lsp-mode
+    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    :hook ((python-mode . lsp)
+	   (lsp-mode . lsp-enable-which-key-integration))
+    :commands lsp)
+
+  (setq company-minimum-prefix-length 1
+      company-idle-delay 0.0) ;; default is 0.2
+#+END_SRC
+
+** Error Checking
+
+*** Flycheck
+
+On the fly syntax checking for GNU Emacs.
+URL: https://github.com/flycheck/flycheck
+
+Flycheck requires external tools to do the syntax checking on the fly.
+Here some tools are listed that are required to be installed for compatibility with that language.
+
+**** C / C++
+
+clang or gcc
+
+**** Python
+
+flake8
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+#+END_SRC
+
+* Keys Cheat Sheet
+
+*** Which Key
+
+Emacs package that displays available keybindings in popup.
+URL: https://github.com/justbur/emacs-which-key
+
 * Note
 
 Emacs can easily replace many other note-taking app.
@@ -291,3 +371,33 @@ Changing the Org Ellipsis from ... to something beautiful.
   (setq org-ellipsis " 🞃")
 #+END_SRC
 
+*** Org Babel
+
+Setting up org babel for different languages.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t)
+       (emacs-lisp . t)))
+#+END_SRC
+
+Setting up lsp to be used while editing org buffer source blocks.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+(defun org-babel-edit-prep:python (babel-info)
+  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+  (lsp))
+#+END_SRC
+
+Configuring Org Babel so that they doesn't auto indenent the source code buffers.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (setq org-src-preserve-indentation t)
+#+END_SRC
+
+Enabling Org tempo.
+
+#+BEGIN_SRC emacs-lisp :tangle "init.el"
+  (require 'org-tempo)
+#+END_SRC
